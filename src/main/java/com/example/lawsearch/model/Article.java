@@ -1,0 +1,31 @@
+package com.example.lawsearch.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Entity
+@Table(name = "article")
+public class Article {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
+
+    @Column(name = "article_number", nullable = false)
+    private String articleNumber;
+
+    @Column(name = "content")
+    private String content;
+
+    // Relația cu tabela law
+    @ManyToOne
+    @JoinColumn(name = "law_id", nullable = false)
+    private Law law;
+}
