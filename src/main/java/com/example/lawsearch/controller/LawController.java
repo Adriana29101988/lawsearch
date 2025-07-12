@@ -1,7 +1,9 @@
 package com.example.lawsearch.controller;
 
+import com.example.lawsearch.dto.LawDTO;
 import com.example.lawsearch.model.Law;
 import com.example.lawsearch.service.LawService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,9 +39,8 @@ public class LawController {
         lawService.deleteLaw(id);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Law> updateLaw(@PathVariable Integer id, @RequestBody Law law) {
-        return lawService.updateLaw(id, law)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<LawDTO> updateLaw(@PathVariable Integer id, @Valid @RequestBody LawDTO lawDTO) {
+        LawDTO updatedLaw = lawService.updateLaw(id, lawDTO);
+        return ResponseEntity.ok(updatedLaw);
     }
 }

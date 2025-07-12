@@ -2,7 +2,9 @@ package com.example.lawsearch.service;
 
 import com.example.lawsearch.model.Article;
 import com.example.lawsearch.model.Law;
+import com.example.lawsearch.repository.ArticleRepository;
 import com.example.lawsearch.repository.LawRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,40 +18,77 @@ public class LawService {
     private final LawRepository lawRepository;
 
     public LawService(LawRepository lawRepository) {
-            this.lawRepository = lawRepository;
+        this.lawRepository = lawRepository;
+    }
+
+    // GET all
+    public List<Law> getAllLaws() {
+        return lawRepository.findAll();
+    }
+
+    // GET by ID
+    public Optional<Law> getLawById(Integer id) {
+        return lawRepository.findById(id);
+    }
+
+    // POST
+    public Law addLaw(Law law) {
+        return lawRepository.save(law);
+    }
+
+    // DELETE
+    public void deleteLaw(Integer id) {
+        lawRepository.deleteById(id);
+    }
+
+    // PUT — actualizare doar pe baza DTO
+    @Transactional
+    public LawDTO updateLaw(Integer id, LawDTO lawDTO) {
+        Law law = lawRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Law not found"));
+
+        law.setTitle(lawDTO.getTitle());
+        law.setDescription(lawDTO.getDescription());
+        law.setVersion(lawDTO.getVersion());
+        law.setCreatedDate(lawDTO.getCreatedDate());
+
+        // înlocuim articolele existente cu cele noi din DTO
+        law.getArticles().clear();
+
+        if (lawDTO.getArticles() != null) {
+            List<Article> updatedArticles = lawDTO.getArticles().stream().map(articleDTO -> {
+                Article article = new Article();
+                article.setId(articleDTO.getId()); // sau null pentru articole noi
+                article.setArticleNumber(articleDTO.getArticleNumber());
+                article.setContent(articleDTO.getContent());
+                article.setLaw(law); // legătura inversă
+                return article;
+            }).collect(Collectors.toList());
+
+            law.getArticles().addAll(updatedArticles);
         }
 
-        public List<Law> getAllLaws() {
-            return lawRepository.findAll();
+        lawRepository.save(law);
+
+        // reconstruiți DTO pentru răspuns
+        LawDTO updatedDTO = new LawDTO();
+        updatedDTO.setId(law.getId());
+        updatedDTO.setTitle(law.getTitle());
+        updatedDTO.setDescription(law.getDescription());
+        updatedDTO.setVersion(law.getVersion());
+        updatedDTO.setCreatedDate(law.getCreatedDate());
+
+        if (law.getArticles() != null) {
+            List<ArticleDTO> articleDTOs = law.getArticles().stream().map(article -> {
+                ArticleDTO dto = new ArticleDTO();
+                dto.setId(article.getId());
+                dto.setArticleNumber(article.getArticleNumber());
+                dto.setContent(article.getContent());
+                return dto;
+            }).collect(Collectors.toList());
+            updatedDTO.setArticles(articleDTOs);
         }
 
-        public Optional<Law> getLawById(Integer id) {
-            return lawRepository.findById(id);
-        }
-
-        public List<Law> searchLawsByTitle(String title) {
-            return lawRepository.findByTitleContainingIgnoreCase(title);
-        }
-
-        public Law addLaw(Law law) {
-            for (Article article : law.getArticles()) {
-                article.setLaw(law);
-            }
-            return lawRepository.save(law);
-        }
-
-        public void deleteLaw(Integer id) {
-            lawRepository.deleteById(id);
-        }
-    public Optional<Law> updateLaw(Integer id, Law updatedLaw) {
-        return lawRepository.findById(id)
-                .map(existingLaw -> {
-                    existingLaw.setTitle(updatedLaw.getTitle());
-                    existingLaw.setDescription(updatedLaw.getDescription());
-                    existingLaw.setVersion(updatedLaw.getVersion());
-                    existingLaw.setCreatedDate(updatedLaw.getCreatedDate());
-                    existingLaw.setArticles(updatedLaw.getArticles());
-                    return lawRepository.save(existingLaw);
-                });
+        return updatedDTO;
     }
 }
