@@ -20,27 +20,30 @@ public class LawController {
     }
 
     @GetMapping
-    public List<Law> getAllLaws() {
-        return lawService.getAllLaws();
+    public ResponseEntity<List<Law>> getAllLaws() {
+        return ResponseEntity.ok(lawService.getAllLaws());
     }
 
     @GetMapping("/{id}")
-    public Optional<Law> getLawById(@PathVariable Integer id) {
-        return lawService.getLawById(id);
+    public ResponseEntity<Law> getLawById(@PathVariable Integer id) {
+        return lawService.getLawById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Law addLaw(@RequestBody Law law) {
-        return lawService.addLaw(law);
+    public ResponseEntity<Law> addLaw(@RequestBody Law law) {
+        return ResponseEntity.ok(lawService.addLaw(law));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteLaw(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteLaw(@PathVariable Integer id) {
         lawService.deleteLaw(id);
+        return ResponseEntity.noContent().build();
     }
+
     @PutMapping("/{id}")
-    public ResponseEntity<LawDTO> updateLaw(@PathVariable Integer id, @Valid @RequestBody LawDTO lawDTO) {
-        LawDTO updatedLaw = lawService.updateLaw(id, lawDTO);
-        return ResponseEntity.ok(updatedLaw);
+    public ResponseEntity<LawDTO> updateLaw(@PathVariable Integer id, @RequestBody LawDTO lawDTO) {
+        return ResponseEntity.ok(lawService.updateLaw(id, lawDTO));
     }
 }

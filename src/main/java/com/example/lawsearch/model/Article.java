@@ -25,6 +25,38 @@ public class Article {
 
     // Relația cu tabela law
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "law_id", nullable = false)
+    @JoinColumn(name = "law_id")
     private Law law;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getArticleNumber() {
+        return articleNumber;
+    }
+
+    public void setArticleNumber(String articleNumber) {
+        this.articleNumber = articleNumber;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Law getLaw() {
+        return law;
+    }
+
+    public void setLaw(Law law) {
+        this.law = law;
+    }
 }

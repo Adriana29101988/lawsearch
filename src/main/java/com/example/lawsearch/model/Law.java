@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class Law {
 
     // Legătura cu articolele
     @OneToMany(mappedBy = "law", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Article> articles;
+    private List<Article> articles = new ArrayList<>();
 
     public void addArticle(Article article) {
         article.setLaw(this);

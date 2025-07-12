@@ -9,12 +9,8 @@ import com.example.lawsearch.repository.LawRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class LawService {
@@ -34,6 +30,11 @@ public class LawService {
     }
 
     public Law addLaw(Law law) {
+        if (law.getArticles() != null) {
+            for (Article article : law.getArticles()) {
+                article.setLaw(law);
+            }
+        }
         return lawRepository.save(law);
     }
 
@@ -44,28 +45,47 @@ public class LawService {
     @Transactional
     public LawDTO updateLaw(Integer id, LawDTO lawDTO) {
         Law existingLaw = lawRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Law was not found "));
+                .orElseThrow(() -> new RuntimeException("Law was not found"));
 
         existingLaw.setTitle(lawDTO.getTitle());
         existingLaw.setDescription(lawDTO.getDescription());
         existingLaw.setVersion(lawDTO.getVersion());
         existingLaw.setCreatedDate(lawDTO.getCreatedDate());
 
-        List<Article> updatedArticles = lawDTO.getArticles().stream().map(dto -> {
-            Article article = new Article();
-            article.setId(dto.getId());
-            article.setArticleNumber(dto.getArticleNumber());
-            article.setContent(dto.getContent());
-            article.setLaw(existingLaw);
-            return article;
-        }).collect(Collectors.toList());
+        // Creează mapă cu articolele existente (id -> Article)
+        Map<Integer, Article> existingArticlesMap = existingLaw.getArticles().stream()
+                .collect(Collectors.toMap(Article::getId, a -> a));
 
-        existingLaw.setArticles(updatedArticles);
+        List<Article> updatedArticles = new ArrayList<>();
+
+        for (ArticleDTO dto : lawDTO.getArticles()) {
+            if (dto.getId() != null && existingArticlesMap.containsKey(dto.getId())) {
+                // Actualizează articol existent
+                Article article = existingArticlesMap.get(dto.getId());
+                article.setArticleNumber(dto.getArticleNumber());
+                article.setContent(dto.getContent());
+                updatedArticles.add(article);
+                existingArticlesMap.remove(dto.getId()); // elimină din mapă, rămân doar cele șterse
+            } else {
+                // Articol nou
+                Article article = new Article();
+                article.setArticleNumber(dto.getArticleNumber());
+                article.setContent(dto.getContent());
+                article.setLaw(existingLaw);
+                updatedArticles.add(article);
+            }
+        }
+
+        // Elimină articolele care nu mai există în DTO (orphanRemoval funcționează)
+        existingLaw.getArticles().clear();
+        existingLaw.getArticles().addAll(updatedArticles);
+
         Law updatedLaw = lawRepository.save(existingLaw);
 
         return mapToDTO(updatedLaw);
     }
 
+    // Metodă pentru conversia unui obiect Law în LawDTO
     private LawDTO mapToDTO(Law law) {
         LawDTO dto = new LawDTO();
         dto.setId(law.getId());
