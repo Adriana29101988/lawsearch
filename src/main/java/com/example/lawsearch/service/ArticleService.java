@@ -21,11 +21,11 @@ public class ArticleService {
         return articleRepository.findAll();
     }
 
-    public Optional<Article> getArticleById(Long id) {
+    public Optional<Article> getArticleById(Integer id) {
         return articleRepository.findById(id);
     }
 
-    public List<Article> getArticlesByLawId(Long lawId) {
+    public List<Article> getArticlesByLawId(Integer lawId) {
         return articleRepository.findByLawId(lawId);
     }
 
@@ -33,7 +33,7 @@ public class ArticleService {
         return articleRepository.save(article);
     }
 
-    public void deleteArticle(Long id) {
+    public void deleteArticle(Integer id) {
         articleRepository.deleteById(id);
     }
 }

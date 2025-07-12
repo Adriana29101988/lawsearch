@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Integer id;
 
     @Column(name = "article_number", nullable = false)
@@ -25,7 +24,7 @@ public class Article {
     private String content;
 
     // Relația cu tabela law
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "law_id", nullable = false)
     private Law law;
 }

@@ -7,8 +7,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ArticleRepository extends JpaRepository<Article, Long> {
-    List<Article> findByLawId(Long lawId);
+public interface ArticleRepository extends JpaRepository<Article, Integer> {
+
+    //gasesc articolel dupa ID
+    List<Article> findByLawId(Integer lawId);
+
     List<Article> findByContentContainingIgnoreCase(String content);
 
 }

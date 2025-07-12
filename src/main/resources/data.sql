@@ -6,6 +6,7 @@ INSERT INTO law (title, description, version, created_date) VALUES
 ('Verordnung Nr.55 der UNECE', 'Mechanische Kupplungsteile', '0.2', '2018-06-15'),
 ('Verordnung Nr.66 der UNECE', 'Stabilität Aufbau Omnibusse', '0.4', '2011-03-30');
 
+INSERT INTO article (article_number, content, law_id) VALUES
 ('Artikel 1', 'Anforderungen an den Unterfahrschutz gemäß UNECE Nr. 58.', 1),
 ('Artikel 2', 'Definition der Beleuchtungseinrichtungen gemäß UNECE Nr. 7.', 2),
 ('Artikel 3', 'Vorgaben für Sicherheitsgurte in Fahrzeugen gemäß UNECE Nr. 16.', 3),
