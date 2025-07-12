@@ -1,5 +1,6 @@
 package com.example.lawsearch.dto;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -7,14 +8,24 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class LawDTO {
+    private Integer id;
+
     @NotBlank
     private String title;
     private String description;
-    private String  version;
+    private String version;
 
     @NotNull
     private LocalDate createdDate;
     private List<ArticleDTO> articles;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;

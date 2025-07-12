@@ -1,13 +1,17 @@
 package com.example.lawsearch.service;
 
+
+import com.example.lawsearch.dto.ArticleDTO;
+import com.example.lawsearch.dto.LawDTO;
 import com.example.lawsearch.model.Article;
 import com.example.lawsearch.model.Law;
-import com.example.lawsearch.repository.ArticleRepository;
 import com.example.lawsearch.repository.LawRepository;
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.http.HttpStatus;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,74 +25,64 @@ public class LawService {
         this.lawRepository = lawRepository;
     }
 
-    // GET all
     public List<Law> getAllLaws() {
         return lawRepository.findAll();
     }
 
-    // GET by ID
     public Optional<Law> getLawById(Integer id) {
         return lawRepository.findById(id);
     }
 
-    // POST
     public Law addLaw(Law law) {
         return lawRepository.save(law);
     }
 
-    // DELETE
     public void deleteLaw(Integer id) {
         lawRepository.deleteById(id);
     }
 
-    // PUT — actualizare doar pe baza DTO
     @Transactional
     public LawDTO updateLaw(Integer id, LawDTO lawDTO) {
-        Law law = lawRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Law not found"));
+        Law existingLaw = lawRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Law was not found "));
 
-        law.setTitle(lawDTO.getTitle());
-        law.setDescription(lawDTO.getDescription());
-        law.setVersion(lawDTO.getVersion());
-        law.setCreatedDate(lawDTO.getCreatedDate());
+        existingLaw.setTitle(lawDTO.getTitle());
+        existingLaw.setDescription(lawDTO.getDescription());
+        existingLaw.setVersion(lawDTO.getVersion());
+        existingLaw.setCreatedDate(lawDTO.getCreatedDate());
 
-        // înlocuim articolele existente cu cele noi din DTO
-        law.getArticles().clear();
+        List<Article> updatedArticles = lawDTO.getArticles().stream().map(dto -> {
+            Article article = new Article();
+            article.setId(dto.getId());
+            article.setArticleNumber(dto.getArticleNumber());
+            article.setContent(dto.getContent());
+            article.setLaw(existingLaw);
+            return article;
+        }).collect(Collectors.toList());
 
-        if (lawDTO.getArticles() != null) {
-            List<Article> updatedArticles = lawDTO.getArticles().stream().map(articleDTO -> {
-                Article article = new Article();
-                article.setId(articleDTO.getId()); // sau null pentru articole noi
-                article.setArticleNumber(articleDTO.getArticleNumber());
-                article.setContent(articleDTO.getContent());
-                article.setLaw(law); // legătura inversă
-                return article;
-            }).collect(Collectors.toList());
+        existingLaw.setArticles(updatedArticles);
+        Law updatedLaw = lawRepository.save(existingLaw);
 
-            law.getArticles().addAll(updatedArticles);
-        }
+        return mapToDTO(updatedLaw);
+    }
 
-        lawRepository.save(law);
+    private LawDTO mapToDTO(Law law) {
+        LawDTO dto = new LawDTO();
+        dto.setId(law.getId());
+        dto.setTitle(law.getTitle());
+        dto.setDescription(law.getDescription());
+        dto.setVersion(law.getVersion());
+        dto.setCreatedDate(law.getCreatedDate());
 
-        // reconstruiți DTO pentru răspuns
-        LawDTO updatedDTO = new LawDTO();
-        updatedDTO.setId(law.getId());
-        updatedDTO.setTitle(law.getTitle());
-        updatedDTO.setDescription(law.getDescription());
-        updatedDTO.setVersion(law.getVersion());
-        updatedDTO.setCreatedDate(law.getCreatedDate());
+        List<ArticleDTO> articleDTOs = law.getArticles().stream().map(article -> {
+            ArticleDTO a = new ArticleDTO();
+            a.setId(article.getId());
+            a.setArticleNumber(article.getArticleNumber());
+            a.setContent(article.getContent());
+            return a;
+        }).collect(Collectors.toList());
 
-        if (law.getArticles() != null) {
-            List<ArticleDTO> articleDTOs = law.getArticles().stream().map(article -> {
-                ArticleDTO dto = new ArticleDTO();
-                dto.setId(article.getId());
-                dto.setArticleNumber(article.getArticleNumber());
-                dto.setContent(article.getContent());
-                return dto;
-            }).collect(Collectors.toList());
-            updatedDTO.setArticles(articleDTOs);
-        }
-
-        return updatedDTO;
+        dto.setArticles(articleDTOs);
+        return dto;
     }
 }
