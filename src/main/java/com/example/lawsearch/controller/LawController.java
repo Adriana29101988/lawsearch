@@ -3,6 +3,8 @@ package com.example.lawsearch.controller;
 import com.example.lawsearch.dto.LawDTO;
 import com.example.lawsearch.model.Law;
 import com.example.lawsearch.service.LawService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@Tag(name = "Laws", description =  "Manage law ")
 @RestController
 @RequestMapping("/api/laws")
 public class LawController {
@@ -26,11 +29,19 @@ public class LawController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Law> getLawById(@PathVariable Integer id) {
-        return lawService.getLawById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Optional<Law> law = lawService.getLawById(id);
+        if (law.isPresent()) {
+            return ResponseEntity.ok(law.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
+//        return lawService.getLawById(id)
+//                .map(ResponseEntity::ok)
+//                .orElse(ResponseEntity.notFound().build());
     }
 
+    @Operation (summary = "create a new law")
     @PostMapping
     public ResponseEntity<Law> addLaw(@RequestBody Law law) {
         return ResponseEntity.ok(lawService.addLaw(law));

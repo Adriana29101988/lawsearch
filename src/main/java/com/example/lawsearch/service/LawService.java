@@ -7,6 +7,7 @@ import com.example.lawsearch.model.Article;
 import com.example.lawsearch.model.Law;
 import com.example.lawsearch.repository.LawRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -17,6 +18,7 @@ public class LawService {
 
     private final LawRepository lawRepository;
 
+    @Autowired
     public LawService(LawRepository lawRepository) {
         this.lawRepository = lawRepository;
     }
