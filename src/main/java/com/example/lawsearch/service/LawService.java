@@ -54,7 +54,7 @@ public class LawService {
         existingLaw.setVersion(lawDTO.getVersion());
         existingLaw.setCreatedDate(lawDTO.getCreatedDate());
 
-        // Creează mapă cu articolele existente (id -> Article)
+
         Map<Integer, Article> existingArticlesMap = existingLaw.getArticles().stream()
                 .collect(Collectors.toMap(Article::getId, a -> a));
 
@@ -62,14 +62,13 @@ public class LawService {
 
         for (ArticleDTO dto : lawDTO.getArticles()) {
             if (dto.getId() != null && existingArticlesMap.containsKey(dto.getId())) {
-                // Actualizează articol existent
                 Article article = existingArticlesMap.get(dto.getId());
                 article.setArticleNumber(dto.getArticleNumber());
                 article.setContent(dto.getContent());
                 updatedArticles.add(article);
-                existingArticlesMap.remove(dto.getId()); // elimină din mapă, rămân doar cele șterse
+                existingArticlesMap.remove(dto.getId());
             } else {
-                // Articol nou
+
                 Article article = new Article();
                 article.setArticleNumber(dto.getArticleNumber());
                 article.setContent(dto.getContent());
@@ -78,7 +77,7 @@ public class LawService {
             }
         }
 
-        // Elimină articolele care nu mai există în DTO (orphanRemoval funcționează)
+        // Elimină articolele care nu mai există în DTO
         existingLaw.getArticles().clear();
         existingLaw.getArticles().addAll(updatedArticles);
 
@@ -87,7 +86,7 @@ public class LawService {
         return mapToDTO(updatedLaw);
     }
 
-    // Metodă pentru conversia unui obiect Law în LawDTO
+
     private LawDTO mapToDTO(Law law) {
         LawDTO dto = new LawDTO();
         dto.setId(law.getId());
