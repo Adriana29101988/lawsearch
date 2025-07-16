@@ -1,6 +1,7 @@
 package com.example.lawsearch.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,11 +41,7 @@ public class Law {
 
     // Legătura cu articolele
     @OneToMany(mappedBy = "law", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Article> articles = new ArrayList<>();
-
-    public void addArticle(Article article) {
-        article.setLaw(this);
-        articles.add(article);
-    }
 
 }
