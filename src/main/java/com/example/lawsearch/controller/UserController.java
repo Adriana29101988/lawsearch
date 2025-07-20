@@ -1,6 +1,6 @@
 package com.example.lawsearch.controller;
 
-import com.example.lawsearch.model.User;
+import com.example.lawsearch.model.AppUser;
 import com.example.lawsearch.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,18 +11,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-
-    private final UserRepository userRepository;
+    private final UserRepository appUserRepository;
 
     public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+        this.appUserRepository = userRepository;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
-        user.setPassword(user.getPassword());
-        user.setRole("USER");
-        userRepository.save(user);
+    public ResponseEntity<String> register(@RequestBody AppUser appUser) {
+        appUser.setPassword(appUser.getPassword());
+        appUser.setRole("USER");
+        appUserRepository.save(appUser);
         return ResponseEntity.ok("User registered successfully");
     }
 }

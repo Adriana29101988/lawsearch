@@ -13,3 +13,7 @@ INSERT INTO article (article_number, content, law_id) VALUES
 ('Artikel 4', 'Regeln zum Einbau von Beleuchtung gemäß UNECE Nr. 48.', 4),
 ('Artikel 5', 'Mechanische Anforderungen an Kupplungssysteme gemäß UNECE Nr. 55.', 5),
 ('Artikel 6', 'Strukturelle Integrität von Omnibussen gemäß UNECE Nr. 66.', 6);
+
+INSERT INTO users(username, password, role) VALUES
+  ('admin', '{noop}admin', 'ADMIN'),
+  ('user', '{noop}user', 'USER');

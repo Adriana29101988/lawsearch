@@ -29,6 +29,4 @@ public class Article {
     @JoinColumn(name = "law_id")
     @JsonBackReference
     private Law law;
-
-
 }

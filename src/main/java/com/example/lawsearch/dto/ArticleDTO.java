@@ -1,7 +1,9 @@
 package com.example.lawsearch.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
+@Data
 public class ArticleDTO {
 
     private Integer id;
@@ -11,27 +13,4 @@ public class ArticleDTO {
 
     private String content;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getArticleNumber() {
-        return articleNumber;
-    }
-
-    public void setArticleNumber(String articleNumber) {
-        this.articleNumber = articleNumber;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
 }

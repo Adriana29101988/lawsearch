@@ -38,8 +38,6 @@ public class Law {
     @Column(name = "created_date")
     private LocalDate createdDate;
 
-
-    // Legătura cu articolele
     @OneToMany(mappedBy = "law", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Article> articles = new ArrayList<>();
